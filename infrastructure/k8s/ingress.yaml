@@ -1,0 +1,59 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: vidcv-ingress
+  namespace: vidcv
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+spec:
+  tls:
+    - hosts:
+        - vidcv.io
+        - api.vidcv.io
+        - ai.vidcv.io
+        - ocr.vidcv.io
+      secretName: vidcv-tls
+  rules:
+    - host: vidcv.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: vidcv-frontend
+                port:
+                  number: 3000
+    - host: api.vidcv.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: vidcv-backend
+                port:
+                  number: 8000
+    - host: ai.vidcv.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: vidcv-ai
+                port:
+                  number: 8001
+    - host: ocr.vidcv.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: vidcv-image-processor
+                port:
+                  number: 8002

@@ -1,0 +1,121 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vidcv-image-processor
+  namespace: vidcv
+  labels:
+    app: vidcv
+    component: image-processor
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: vidcv
+      component: image-processor
+  template:
+    metadata:
+      labels:
+        app: vidcv
+        component: image-processor
+    spec:
+      containers:
+        - name: image-processor
+          image: ghcr.io/metinemredonmez/img-try/image-processor:latest
+          ports:
+            - containerPort: 8002
+          env:
+            - name: OCR_PROVIDER
+              value: "tesseract"
+            - name: OCR_LANGUAGES
+              value: "eng+tur"
+            - name: USE_GPU
+              value: "false"
+            - name: MAX_WORKERS
+              value: "4"
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: vidcv-secrets
+                  key: redis-url
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "500m"
+            limits:
+              memory: "2Gi"
+              cpu: "2000m"
+          livenessProbe:
+            httpGet:
+              path: /image-processor/health
+              port: 8002
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /image-processor/health
+              port: 8002
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          volumeMounts:
+            - name: tessdata
+              mountPath: /usr/share/tesseract-ocr/4.00/tessdata
+              readOnly: true
+      volumes:
+        - name: tessdata
+          persistentVolumeClaim:
+            claimName: tessdata-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vidcv-image-processor
+  namespace: vidcv
+spec:
+  selector:
+    app: vidcv
+    component: image-processor
+  ports:
+    - port: 8002
+      targetPort: 8002
+  type: ClusterIP
+---
+# PVC for Tesseract language data
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: tessdata-pvc
+  namespace: vidcv
+spec:
+  accessModes:
+    - ReadOnlyMany
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: standard
+---
+# HPA for auto-scaling based on CPU usage
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: image-processor-hpa
+  namespace: vidcv
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: vidcv-image-processor
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80

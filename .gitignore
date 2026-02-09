@@ -1,0 +1,90 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+venv/
+env/
+.venv/
+.env
+
+# Build outputs
+dist/
+build/
+*.egg-info/
+.next/
+out/
+.nuxt/
+*.swp
+
+# IDE
+.idea/
+.vscode/
+*.sublime-*
+.DS_Store
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Testing
+coverage/
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+
+# Database
+*.db
+*.sqlite3
+
+# Secrets
+*.pem
+*.key
+credentials/
+secrets/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Python
+*.pyc
+*.pyo
+*.pyd
+.eggs/
+pip-log.txt
+
+# Docker
+.docker/
+
+# Temp files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Jupyter
+.ipynb_checkpoints/
+
+# AI Models (large files)
+*.h5
+*.pkl
+*.pt
+*.pth
+*.onnx
+models/*.bin
+
+# Media uploads
+media/
+uploads/
+staticfiles/
