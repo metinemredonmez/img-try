@@ -313,7 +313,7 @@ Bu proje MIT lisansı altında lisanslanmıştır. Detaylar için [LICENSE](LICE
 
 - **Deep Room AI** - [@deeproomai](https://twitter.com/deeproomai)
 - **Email** - contact@deeproomai.com
-- **Website** - [https://deeproom.ai](https://deeproomai.com)
+- **Website** - [https://deeproomai.com](https://deeproomai.com)
 
 ---
 
